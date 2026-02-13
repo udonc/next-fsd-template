@@ -25,6 +25,18 @@
       "recommended": true,
       "suspicious": {
         "noUnknownAtRules": "off"
+      },
+      "nursery": {
+        "noImportCycles": {
+          "level": "error",
+          "options": { "ignoreTypes": true }
+        }
+      },
+      "correctness": {
+        "noPrivateImports": "error"
+      },
+      "performance": {
+        "noReExportAll": "error"
       }
     },
     "domains": {
@@ -38,5 +50,270 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "plugins": [
+    "./biome/fsd-no-cross-import.grit",
+    "./biome/no-deep-relative-import.grit"
+  ],
+  "overrides": [
+    // Next.js App Router (app/): ルーティング専用、@widgets/@features/@entities への直接依存を禁止
+    {
+      "includes": ["app/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@widgets", "@widgets/**"],
+                    "message": "FSD違反: Next.js App Router (app/) から @widgets を直接インポートできません。@app または @pages レイヤーを経由してください。"
+                  },
+                  {
+                    "group": ["@features", "@features/**"],
+                    "message": "FSD違反: Next.js App Router (app/) から @features を直接インポートできません。@app または @pages レイヤーを経由してください。"
+                  },
+                  {
+                    "group": ["@entities", "@entities/**"],
+                    "message": "FSD違反: Next.js App Router (app/) から @entities を直接インポートできません。@app または @pages レイヤーを経由してください。"
+                  },
+                  {
+                    "group": ["@pages/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": ["@shared/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    // FSD pages 層: @app への依存を禁止
+    {
+      "includes": ["src/pages/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@app", "@app/**"],
+                    "message": "FSD違反: pages レイヤーから @app レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@widgets/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": ["@features/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": ["@entities/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": ["@shared/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    // FSD widgets 層: @app, @pages への依存を禁止
+    {
+      "includes": ["src/widgets/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@app", "@app/**"],
+                    "message": "FSD違反: widgets レイヤーから @app レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@pages", "@pages/**"],
+                    "message": "FSD違反: widgets レイヤーから @pages レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@features/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": ["@entities/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": ["@shared/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    // FSD features 層: @app, @pages, @widgets への依存を禁止
+    {
+      "includes": ["src/features/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@app", "@app/**"],
+                    "message": "FSD違反: features レイヤーから @app レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@pages", "@pages/**"],
+                    "message": "FSD違反: features レイヤーから @pages レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@widgets", "@widgets/**"],
+                    "message": "FSD違反: features レイヤーから @widgets レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@entities/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": ["@shared/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    // FSD entities 層: @app, @pages, @widgets, @features への依存を禁止
+    {
+      "includes": ["src/entities/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@app", "@app/**"],
+                    "message": "FSD違反: entities レイヤーから @app レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@pages", "@pages/**"],
+                    "message": "FSD違反: entities レイヤーから @pages レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@widgets", "@widgets/**"],
+                    "message": "FSD違反: entities レイヤーから @widgets レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@features", "@features/**"],
+                    "message": "FSD違反: entities レイヤーから @features レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@shared/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    // FSD app 層: 全レイヤ import 可だが deep import は禁止
+    {
+      "includes": ["src/app/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@pages/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": ["@widgets/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": ["@features/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": ["@entities/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": ["@shared/*/**"],
+                    "message": "FSD違反: ディープインポートが検出されました。公開API（バレルファイル）を使用してください。"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    // FSD shared 層: 全 FSD レイヤへの依存を禁止（外部ライブラリのみ許可）
+    {
+      "includes": ["src/shared/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@app", "@app/**"],
+                    "message": "FSD違反: shared レイヤーから @app レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@pages", "@pages/**"],
+                    "message": "FSD違反: shared レイヤーから @pages レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@widgets", "@widgets/**"],
+                    "message": "FSD違反: shared レイヤーから @widgets レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@features", "@features/**"],
+                    "message": "FSD違反: shared レイヤーから @features レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@entities", "@entities/**"],
+                    "message": "FSD違反: shared レイヤーから @entities レイヤーをインポートできません。"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }
