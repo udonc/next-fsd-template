@@ -55,7 +55,8 @@
     "./biome/fsd-no-cross-import.grit",
     "./biome/no-deep-relative-import.grit",
     "./biome/fsd-valid-layer.grit",
-    "./biome/fsd-valid-segment.grit"
+    "./biome/fsd-valid-segment.grit",
+    "./biome/fsd-barrel-export-only.grit"
   ],
   "overrides": [
     // Next.js App Router (app/): ルーティング専用、@widgets/@features/@entities への直接依存を禁止

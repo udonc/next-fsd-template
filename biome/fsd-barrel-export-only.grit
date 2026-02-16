@@ -1,0 +1,32 @@
+language js
+
+// バレルファイル (index.ts) は re-export のみ許可。
+// Biome ネイティブ AST ノードタイプ (PascalCase) + `as` 束縛でマッチ。
+// 対象: src/{pages,widgets,features,entities}/<slice>/index.*
+
+or {
+  JsDirective() as $stmt where {
+    $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/index\.[^/]+$",
+    register_diagnostic(span=$stmt, message="FSD違反: バレルファイル (index.ts) は re-export のみ許可されています。ディレクティブは各コンポーネントファイルに記述してください。", severity="error")
+  },
+  JsImport() as $stmt where {
+    $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/index\.[^/]+$",
+    register_diagnostic(span=$stmt, message="FSD違反: バレルファイル (index.ts) は re-export のみ許可されています。import ではなく `export { ... } from '...'` を使用してください。", severity="error")
+  },
+  JsVariableStatement() as $stmt where {
+    $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/index\.[^/]+$",
+    register_diagnostic(span=$stmt, message="FSD違反: バレルファイル (index.ts) は re-export のみ許可されています。変数宣言はセグメント内のファイルに移動してください。", severity="error")
+  },
+  JsFunctionDeclaration() as $stmt where {
+    $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/index\.[^/]+$",
+    register_diagnostic(span=$stmt, message="FSD違反: バレルファイル (index.ts) は re-export のみ許可されています。関数宣言はセグメント内のファイルに移動してください。", severity="error")
+  },
+  JsClassDeclaration() as $stmt where {
+    $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/index\.[^/]+$",
+    register_diagnostic(span=$stmt, message="FSD違反: バレルファイル (index.ts) は re-export のみ許可されています。クラス宣言はセグメント内のファイルに移動してください。", severity="error")
+  },
+  JsExpressionStatement() as $stmt where {
+    $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/index\.[^/]+$",
+    register_diagnostic(span=$stmt, message="FSD違反: バレルファイル (index.ts) は re-export のみ許可されています。", severity="error")
+  }
+}
