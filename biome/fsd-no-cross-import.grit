@@ -10,7 +10,7 @@ or {
     JsExportNamedFromClause() as $stmt,
     JsExportFromClause() as $stmt
   } where {
-    $stmt <: contains `$src` => . where { $src <: r"\"@.*" },
+    $stmt <: contains `$src` where { $src <: r"\"@.*" },
     $filename <: r".*/(pages|widgets|features|entities)/([^/]+)/.*"($layer, $current),
     or {
       { $layer <: "pages", $src <: r"\"@pages/.*" },
@@ -29,7 +29,7 @@ or {
     JsExportNamedFromClause() as $stmt,
     JsExportFromClause() as $stmt
   } where {
-    $stmt <: contains `$src` => . where { $src <: r"^\"\.\.(?:/.*)?\"$" },
+    $stmt <: contains `$src` where { $src <: r"^\"\.\.(?:/.*)?\"$" },
     $filename <: r".*/(?:pages|widgets|features|entities)/[^/]+/[^/]+$",
     register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内のスライス間のクロスインポートは禁止されています（相対パスがスライス境界を越えています）。", severity="error")
   }

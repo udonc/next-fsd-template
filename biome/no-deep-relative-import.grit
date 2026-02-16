@@ -5,6 +5,6 @@ or {
   JsExportNamedFromClause() as $stmt,
   JsExportFromClause() as $stmt
 } where {
-  $stmt <: contains `$src` => . where { $src <: r"\"\.\./\.\..*" },
+  $stmt <: contains `$src` where { $src <: r"\"\.\./\.\..*" },
   register_diagnostic(span=$src, message="2階層以上の相対パスインポートは禁止です。パスエイリアスを使用してください。", severity="error")
 }

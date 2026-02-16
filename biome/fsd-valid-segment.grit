@@ -5,7 +5,7 @@ or {
   JsExportNamedFromClause() as $stmt,
   JsExportFromClause() as $stmt
 } where {
-  $stmt <: contains `$src` => . where { $src <: r"\".*" },
+  $stmt <: contains `$src` where { $src <: r"\".*" },
   or {
     $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/([^/]+)/.*"($segment),
     $filename <: r".*/src/(?:app|shared)/([^/]+)/.*"($segment)
