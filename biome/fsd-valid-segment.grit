@@ -24,9 +24,49 @@ or {
     register_diagnostic(span=$src, message="FSD違反: セグメントディレクトリは ui, model, api, lib, config のみ許可されています。", severity="error")
   },
   // ============================================================
-  // セグメント検証 (export ... from)
+  // セグメント検証 (namespace import)
   // ============================================================
-  `export $what from $src` where {
+  `import * as $name from $src` where {
+    or {
+      $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/([^/]+)/.*"($segment),
+      $filename <: r".*/src/(?:app|shared)/([^/]+)/.*"($segment)
+    },
+    not {
+      or {
+        $segment <: "ui",
+        $segment <: "model",
+        $segment <: "api",
+        $segment <: "lib",
+        $segment <: "config"
+      }
+    },
+    register_diagnostic(span=$src, message="FSD違反: セグメントディレクトリは ui, model, api, lib, config のみ許可されています。", severity="error")
+  },
+  // ============================================================
+  // セグメント検証 (export { ... } from)
+  // ============================================================
+  JsExportNamedFromClause() as $stmt where {
+    $stmt <: contains `$src` => . where { $src <: r"\".*" },
+    or {
+      $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/([^/]+)/.*"($segment),
+      $filename <: r".*/src/(?:app|shared)/([^/]+)/.*"($segment)
+    },
+    not {
+      or {
+        $segment <: "ui",
+        $segment <: "model",
+        $segment <: "api",
+        $segment <: "lib",
+        $segment <: "config"
+      }
+    },
+    register_diagnostic(span=$src, message="FSD違反: セグメントディレクトリは ui, model, api, lib, config のみ許可されています。", severity="error")
+  },
+  // ============================================================
+  // セグメント検証 (export * from)
+  // ============================================================
+  JsExportFromClause() as $stmt where {
+    $stmt <: contains `$src` => . where { $src <: r"\".*" },
     or {
       $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/([^/]+)/.*"($segment),
       $filename <: r".*/src/(?:app|shared)/([^/]+)/.*"($segment)

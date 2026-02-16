@@ -8,47 +8,113 @@ or {
     or {
       {
         $filename <: r".*/pages/([^/]+)/.*"($current),
-        $src <: r"\"@pages/([^/\"]+)"($target)
+        $src <: r"\"@pages/.*",
+        not { $src <: `"@pages/$current"` }
       },
       {
         $filename <: r".*/widgets/([^/]+)/.*"($current),
-        $src <: r"\"@widgets/([^/\"]+)"($target)
+        $src <: r"\"@widgets/.*",
+        not { $src <: `"@widgets/$current"` }
       },
       {
         $filename <: r".*/features/([^/]+)/.*"($current),
-        $src <: r"\"@features/([^/\"]+)"($target)
+        $src <: r"\"@features/.*",
+        not { $src <: `"@features/$current"` }
       },
       {
         $filename <: r".*/entities/([^/]+)/.*"($current),
-        $src <: r"\"@entities/([^/\"]+)"($target)
+        $src <: r"\"@entities/.*",
+        not { $src <: `"@entities/$current"` }
       }
     },
-    not { $current <: $target },
     register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内のスライス間のクロスインポートは禁止されています。", severity="error")
   },
   // ============================================================
-  // 絶対パス: @<layer>/<other_slice> (export ... from)
+  // 絶対パス: @<layer>/<other_slice> (namespace import)
   // ============================================================
-  `export $what from $src` where {
+  `import * as $name from $src` where {
     or {
       {
         $filename <: r".*/pages/([^/]+)/.*"($current),
-        $src <: r"\"@pages/([^/\"]+)"($target)
+        $src <: r"\"@pages/.*",
+        not { $src <: `"@pages/$current"` }
       },
       {
         $filename <: r".*/widgets/([^/]+)/.*"($current),
-        $src <: r"\"@widgets/([^/\"]+)"($target)
+        $src <: r"\"@widgets/.*",
+        not { $src <: `"@widgets/$current"` }
       },
       {
         $filename <: r".*/features/([^/]+)/.*"($current),
-        $src <: r"\"@features/([^/\"]+)"($target)
+        $src <: r"\"@features/.*",
+        not { $src <: `"@features/$current"` }
       },
       {
         $filename <: r".*/entities/([^/]+)/.*"($current),
-        $src <: r"\"@entities/([^/\"]+)"($target)
+        $src <: r"\"@entities/.*",
+        not { $src <: `"@entities/$current"` }
       }
     },
-    not { $current <: $target },
+    register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内のスライス間のクロスインポートは禁止されています。", severity="error")
+  },
+  // ============================================================
+  // 絶対パス: @<layer>/<other_slice> (export { ... } from)
+  // NOTE: `export $what from $src` は Biome GritQL で未サポートのため
+  //       JsExportNamedFromClause + contains で $src を取得する
+  // ============================================================
+  JsExportNamedFromClause() as $stmt where {
+    $stmt <: contains `$src` => . where { $src <: r"\"@.*" },
+    or {
+      {
+        $filename <: r".*/pages/([^/]+)/.*"($current),
+        $src <: r"\"@pages/.*",
+        not { $src <: `"@pages/$current"` }
+      },
+      {
+        $filename <: r".*/widgets/([^/]+)/.*"($current),
+        $src <: r"\"@widgets/.*",
+        not { $src <: `"@widgets/$current"` }
+      },
+      {
+        $filename <: r".*/features/([^/]+)/.*"($current),
+        $src <: r"\"@features/.*",
+        not { $src <: `"@features/$current"` }
+      },
+      {
+        $filename <: r".*/entities/([^/]+)/.*"($current),
+        $src <: r"\"@entities/.*",
+        not { $src <: `"@entities/$current"` }
+      }
+    },
+    register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内のスライス間のクロスインポートは禁止されています。", severity="error")
+  },
+  // ============================================================
+  // 絶対パス: @<layer>/<other_slice> (export * from)
+  // ============================================================
+  JsExportFromClause() as $stmt where {
+    $stmt <: contains `$src` => . where { $src <: r"\"@.*" },
+    or {
+      {
+        $filename <: r".*/pages/([^/]+)/.*"($current),
+        $src <: r"\"@pages/.*",
+        not { $src <: `"@pages/$current"` }
+      },
+      {
+        $filename <: r".*/widgets/([^/]+)/.*"($current),
+        $src <: r"\"@widgets/.*",
+        not { $src <: `"@widgets/$current"` }
+      },
+      {
+        $filename <: r".*/features/([^/]+)/.*"($current),
+        $src <: r"\"@features/.*",
+        not { $src <: `"@features/$current"` }
+      },
+      {
+        $filename <: r".*/entities/([^/]+)/.*"($current),
+        $src <: r"\"@entities/.*",
+        not { $src <: `"@entities/$current"` }
+      }
+    },
     register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内のスライス間のクロスインポートは禁止されています。", severity="error")
   },
   // ============================================================
@@ -60,9 +126,28 @@ or {
     $src <: r"^\"\.\.(?:/.*)?\"$",
     register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内のスライス間のクロスインポートは禁止されています（相対パスがスライス境界を越えています）。", severity="error")
   },
-  `export $what from $src` where {
+  // ============================================================
+  // 相対パス — 深さ1: namespace import
+  // ============================================================
+  `import * as $name from $src` where {
     $filename <: r".*/(?:pages|widgets|features|entities)/[^/]+/[^/]+$",
     $src <: r"^\"\.\.(?:/.*)?\"$",
+    register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内のスライス間のクロスインポートは禁止されています（相対パスがスライス境界を越えています）。", severity="error")
+  },
+  // ============================================================
+  // 相対パス — 深さ1: export { ... } from
+  // ============================================================
+  JsExportNamedFromClause() as $stmt where {
+    $stmt <: contains `$src` => . where { $src <: r"^\"\.\.(?:/.*)?\"$" },
+    $filename <: r".*/(?:pages|widgets|features|entities)/[^/]+/[^/]+$",
+    register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内のスライス間のクロスインポートは禁止されています（相対パスがスライス境界を越えています）。", severity="error")
+  },
+  // ============================================================
+  // 相対パス — 深さ1: export * from
+  // ============================================================
+  JsExportFromClause() as $stmt where {
+    $stmt <: contains `$src` => . where { $src <: r"^\"\.\.(?:/.*)?\"$" },
+    $filename <: r".*/(?:pages|widgets|features|entities)/[^/]+/[^/]+$",
     register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内のスライス間のクロスインポートは禁止されています（相対パスがスライス境界を越えています）。", severity="error")
   }
 }
