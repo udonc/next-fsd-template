@@ -1,22 +1,10 @@
 language js
 
 or {
-  `import $what from $src` where {
-    $src <: r"\"\.\./\.\..*",
-    register_diagnostic(span=$src, message="2階層以上の相対パスインポートは禁止です。パスエイリアスを使用してください。", severity="error")
-  },
-  `import * as $name from $src` where {
-    $src <: r"\"\.\./\.\..*",
-    register_diagnostic(span=$src, message="2階層以上の相対パスインポートは禁止です。パスエイリアスを使用してください。", severity="error")
-  },
-  // export { ... } from "../../..."
-  JsExportNamedFromClause() as $stmt where {
-    $stmt <: contains `$src` => . where { $src <: r"\"\.\./\.\..*" },
-    register_diagnostic(span=$src, message="2階層以上の相対パスインポートは禁止です。パスエイリアスを使用してください。", severity="error")
-  },
-  // export * from "../../..."
-  JsExportFromClause() as $stmt where {
-    $stmt <: contains `$src` => . where { $src <: r"\"\.\./\.\..*" },
-    register_diagnostic(span=$src, message="2階層以上の相対パスインポートは禁止です。パスエイリアスを使用してください。", severity="error")
-  }
+  JsImport() as $stmt,
+  JsExportNamedFromClause() as $stmt,
+  JsExportFromClause() as $stmt
+} where {
+  $stmt <: contains `$src` => . where { $src <: r"\"\.\./\.\..*" },
+  register_diagnostic(span=$src, message="2階層以上の相対パスインポートは禁止です。パスエイリアスを使用してください。", severity="error")
 }

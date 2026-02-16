@@ -1,76 +1,21 @@
 language js
 
 or {
-  // ============================================================
-  // レイヤー検証 (import)
-  // src/ 直下のディレクトリは FSD レイヤーのみ許可
-  // 許可: app, pages, widgets, features, entities, shared
-  // ============================================================
-  `import $what from $src` where {
-    $filename <: r".*/src/([^/]+)/.*"($layer),
-    not {
-      or {
-        $layer <: "app",
-        $layer <: "pages",
-        $layer <: "widgets",
-        $layer <: "features",
-        $layer <: "entities",
-        $layer <: "shared"
-      }
-    },
-    register_diagnostic(span=$src, message="FSD違反: src/ 直下には app, pages, widgets, features, entities, shared のみ配置できます。", severity="error")
+  JsImport() as $stmt,
+  JsExportNamedFromClause() as $stmt,
+  JsExportFromClause() as $stmt
+} where {
+  $stmt <: contains `$src` => . where { $src <: r"\".*" },
+  $filename <: r".*/src/([^/]+)/.*"($layer),
+  not {
+    or {
+      $layer <: "app",
+      $layer <: "pages",
+      $layer <: "widgets",
+      $layer <: "features",
+      $layer <: "entities",
+      $layer <: "shared"
+    }
   },
-  // ============================================================
-  // レイヤー検証 (namespace import)
-  // ============================================================
-  `import * as $name from $src` where {
-    $filename <: r".*/src/([^/]+)/.*"($layer),
-    not {
-      or {
-        $layer <: "app",
-        $layer <: "pages",
-        $layer <: "widgets",
-        $layer <: "features",
-        $layer <: "entities",
-        $layer <: "shared"
-      }
-    },
-    register_diagnostic(span=$src, message="FSD違反: src/ 直下には app, pages, widgets, features, entities, shared のみ配置できます。", severity="error")
-  },
-  // ============================================================
-  // レイヤー検証 (export { ... } from)
-  // ============================================================
-  JsExportNamedFromClause() as $stmt where {
-    $stmt <: contains `$src` => . where { $src <: r"\".*" },
-    $filename <: r".*/src/([^/]+)/.*"($layer),
-    not {
-      or {
-        $layer <: "app",
-        $layer <: "pages",
-        $layer <: "widgets",
-        $layer <: "features",
-        $layer <: "entities",
-        $layer <: "shared"
-      }
-    },
-    register_diagnostic(span=$src, message="FSD違反: src/ 直下には app, pages, widgets, features, entities, shared のみ配置できます。", severity="error")
-  },
-  // ============================================================
-  // レイヤー検証 (export * from)
-  // ============================================================
-  JsExportFromClause() as $stmt where {
-    $stmt <: contains `$src` => . where { $src <: r"\".*" },
-    $filename <: r".*/src/([^/]+)/.*"($layer),
-    not {
-      or {
-        $layer <: "app",
-        $layer <: "pages",
-        $layer <: "widgets",
-        $layer <: "features",
-        $layer <: "entities",
-        $layer <: "shared"
-      }
-    },
-    register_diagnostic(span=$src, message="FSD違反: src/ 直下には app, pages, widgets, features, entities, shared のみ配置できます。", severity="error")
-  }
+  register_diagnostic(span=$src, message="FSD違反: src/ 直下には app, pages, widgets, features, entities, shared のみ配置できます。", severity="error")
 }
