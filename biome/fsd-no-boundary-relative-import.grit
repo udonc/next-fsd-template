@@ -1,0 +1,22 @@
+language js
+
+// src/ 配下で FSD のレイヤー/スライス/セグメント境界を越える ../ 相対パスインポートを禁止。
+// パスエイリアス (@app, @features/*, @shared/* 等) の使用を強制する。
+
+or {
+  JsImport() as $stmt,
+  JsExportNamedFromClause() as $stmt,
+  JsExportFromClause() as $stmt,
+  JsImportCallExpression() as $stmt
+} where {
+  $stmt <: contains `$src` where { $src <: r"\"\.\..*" },
+  or {
+    // src/app/ 直下のファイル: ../ でレイヤー外に脱出する
+    { $filename <: r".*/src/app/[^/]+$" },
+    // src/<layer>/<unit>/ 直下のファイル: ../ でスライス/セグメント境界を越える
+    {
+      $filename <: r".*/src/(?:pages|widgets|features|entities|shared)/[^/]+/[^/]+$"
+    }
+  },
+  register_diagnostic(span=$src, message="FSD違反: レイヤー/スライス/セグメント境界を越える相対パスインポートは禁止です。パスエイリアスを使用してください。", severity="error")
+}

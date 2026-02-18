@@ -8,7 +8,8 @@ or {
   or {
     JsImport() as $stmt,
     JsExportNamedFromClause() as $stmt,
-    JsExportFromClause() as $stmt
+    JsExportFromClause() as $stmt,
+    JsImportCallExpression() as $stmt
   } where {
     $stmt <: contains `$src` where { $src <: r"\"@.*" },
     $filename <: r".*/(pages|widgets|features|entities)/([^/]+)/.*"($layer, $current),
@@ -27,7 +28,8 @@ or {
   or {
     JsImport() as $stmt,
     JsExportNamedFromClause() as $stmt,
-    JsExportFromClause() as $stmt
+    JsExportFromClause() as $stmt,
+    JsImportCallExpression() as $stmt
   } where {
     $stmt <: contains `$src` where { $src <: r"^\"\.\.(?:/.*)?\"$" },
     $filename <: r".*/(?:pages|widgets|features|entities)/[^/]+/[^/]+$",

@@ -1,15 +1,11 @@
 language js
 
 or {
-  JsImport() as $stmt,
   JsExportNamedFromClause() as $stmt,
   JsExportFromClause() as $stmt
 } where {
-  $stmt <: contains `$src` where { $src <: r"\".*" },
-  or {
-    $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/([^/]+)/.*"($segment),
-    $filename <: r".*/src/(?:app|shared)/([^/]+)/.*"($segment)
-  },
+  $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/index\.[^/]+$",
+  $stmt <: contains `$src` where { $src <: r"\"\.\/([^/\"]+).*"($segment) },
   not {
     or {
       $segment <: "ui",
