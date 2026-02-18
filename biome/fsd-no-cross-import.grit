@@ -14,16 +14,25 @@ or {
     $stmt <: contains `$src` where { $src <: r"\"@.*" },
     $filename <: r".*/(pages|widgets|features|entities)/([^/]+)/.*"($layer, $current),
     or {
-      { $layer <: "pages", $src <: r"\"@pages/.*" },
-      { $layer <: "widgets", $src <: r"\"@widgets/.*" },
-      { $layer <: "features", $src <: r"\"@features/.*" },
-      { $layer <: "entities", $src <: r"\"@entities/.*" }
+      { $layer <: "pages", $src <: r"^\"@pages/([^/\"]+)(?:/.*)?\"$"($target) },
+      {
+        $layer <: "widgets",
+        $src <: r"^\"@widgets/([^/\"]+)(?:/.*)?\"$"($target)
+      },
+      {
+        $layer <: "features",
+        $src <: r"^\"@features/([^/\"]+)(?:/.*)?\"$"($target)
+      },
+      {
+        $layer <: "entities",
+        $src <: r"^\"@entities/([^/\"]+)(?:/.*)?\"$"($target)
+      }
     },
-    not { $src <: `"@$layer/$current"` },
+    not { $target <: $current },
     register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内のスライス間のクロスインポートは禁止されています。", severity="error")
   },
   // ============================================================
-  // 相対パス — スライスルートから ../ でスライス外へ
+  // 相対パス — ../ でレイヤー/スライス/セグメント境界を越える
   // ============================================================
   or {
     JsImport() as $stmt,
@@ -32,7 +41,14 @@ or {
     JsImportCallExpression() as $stmt
   } where {
     $stmt <: contains `$src` where { $src <: r"^\"\.\.(?:/.*)?\"$" },
-    $filename <: r".*/(?:pages|widgets|features|entities)/[^/]+/[^/]+$",
-    register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内のスライス間のクロスインポートは禁止されています（相対パスがスライス境界を越えています）。", severity="error")
+    or {
+      // src/<layer>/<unit>/ 直下: ../ でスライス/セグメント境界を越える
+      {
+        $filename <: r".*/(?:pages|widgets|features|entities|shared)/[^/]+/[^/]+$"
+      },
+      // src/app/ 直下: ../ でレイヤー外に脱出する
+      { $filename <: r".*/src/app/[^/]+$" }
+    },
+    register_diagnostic(span=$src, message="FSD違反: レイヤー/スライス/セグメント境界を越える相対パスインポートは禁止です。パスエイリアスを使用してください。", severity="error")
   }
 }

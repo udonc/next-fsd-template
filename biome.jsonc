@@ -54,9 +54,7 @@
   "plugins": [
     "./biome/fsd-no-cross-import.grit",
     "./biome/no-deep-relative-import.grit",
-    "./biome/fsd-valid-segment.grit",
-    "./biome/fsd-barrel-export-only.grit",
-    "./biome/fsd-no-boundary-relative-import.grit"
+    "./biome/fsd-barrel-export-only.grit"
   ],
   "overrides": [
     // Next.js App Router (app/): ルーティング専用、@widgets/@features/@entities への直接依存を禁止
@@ -314,6 +312,67 @@
                   {
                     "group": ["@entities", "@entities/**"],
                     "message": "FSD違反: shared レイヤーから @entities レイヤーをインポートできません。"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    // FSD バレルファイル: alias インポート禁止 + 許可セグメント以外の相対インポート禁止
+    // NOTE: このoverride は上のレイヤー別 override を replace するため、alias 制限もここで定義
+    {
+      "includes": [
+        "src/pages/*/index.ts",
+        "src/pages/*/index.tsx",
+        "src/widgets/*/index.ts",
+        "src/widgets/*/index.tsx",
+        "src/features/*/index.ts",
+        "src/features/*/index.tsx",
+        "src/entities/*/index.ts",
+        "src/entities/*/index.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@app",
+                      "@app/**",
+                      "@pages",
+                      "@pages/**",
+                      "@widgets",
+                      "@widgets/**",
+                      "@features",
+                      "@features/**",
+                      "@entities",
+                      "@entities/**",
+                      "@shared",
+                      "@shared/**"
+                    ],
+                    "message": "FSD違反: バレルファイルではパスエイリアスを使用したインポートはできません。ローカルセグメントから re-export してください。"
+                  },
+                  {
+                    "group": [
+                      "./*",
+                      "./**",
+                      "!./ui",
+                      "!./ui/**",
+                      "!./model",
+                      "!./model/**",
+                      "!./api",
+                      "!./api/**",
+                      "!./lib",
+                      "!./lib/**",
+                      "!./config",
+                      "!./config/**"
+                    ],
+                    "message": "FSD違反: セグメントディレクトリは ui, model, api, lib, config のみ許可されています。"
                   }
                 ]
               }
