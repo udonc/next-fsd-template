@@ -19,7 +19,6 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
       "@app": ["./src/app"],
       "@app/*": ["./src/app/*"],
       "@pages": ["./src/pages"],
