@@ -29,7 +29,14 @@ or {
       }
     },
     not { $target <: $current },
-    register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内の別スライスからインポートできません。", severity="error")
+    // @x/ クロスインポートAPI例外: @entities/<provider>/@x/<consumer> は
+    // <consumer> が現在のスライスと一致する場合のみ許可
+    not {
+      $layer <: "entities",
+      $src <: r"^\"@entities/[^/]+/@x/([^/\"]+)\"$"($consumer),
+      $consumer <: $current
+    },
+    register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内の別スライスからインポートできません。@x/ クロスインポートAPIを使用してください。", severity="error")
   },
   // ============================================================
   // 相対パス — ../ でレイヤー/スライス/セグメント境界を越える
