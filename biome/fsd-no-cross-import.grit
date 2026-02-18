@@ -9,7 +9,8 @@ or {
     JsImport() as $stmt,
     JsExportNamedFromClause() as $stmt,
     JsExportFromClause() as $stmt,
-    JsImportCallExpression() as $stmt
+    JsImportCallExpression() as $stmt,
+    TsImportType() as $stmt
   } where {
     $stmt <: contains `$src` where { $src <: r"\"@.*" },
     $filename <: r".*/(pages|widgets|features|entities)/([^/]+)/.*"($layer, $current),
@@ -39,13 +40,69 @@ or {
     register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内の別スライスからインポートできません。@x/ クロスインポートAPIを使用してください。", severity="error")
   },
   // ============================================================
+  // 自スライスの @x/ アクセス（不要な間接参照）
+  // @entities/<self>/@x/<consumer> を自スライスからインポートするのは不要
+  // ============================================================
+  or {
+    JsImport() as $stmt,
+    JsExportNamedFromClause() as $stmt,
+    JsExportFromClause() as $stmt,
+    JsImportCallExpression() as $stmt,
+    TsImportType() as $stmt
+  } where {
+    $stmt <: contains `$src` where {
+      $src <: r"^\"@entities/([^/]+)/@x/.*\"$"($provider)
+    },
+    $filename <: r".*/entities/([^/]+)/.*"($current),
+    $provider <: $current,
+    register_diagnostic(span=$src, message="FSD違反: 自スライスの @x/ クロスインポートAPIにアクセスする必要はありません。ローカルセグメントから直接インポートしてください。", severity="error")
+  },
+  // ============================================================
+  // TsImportType (typeof import()) の上位レイヤー依存検出
+  // noRestrictedImports が typeof import() をカバーしないため GritQL で補完
+  // ============================================================
+  TsImportType() as $stmt where {
+    $stmt <: contains `$src` where { $src <: r"\"@.*" },
+    or {
+      {
+        $filename <: r".*/src/shared/.*",
+        $src <: r"^\"@(?:app|pages|widgets|features|entities)(?:/.*)?\"$"
+      },
+      {
+        $filename <: r".*/src/entities/.*",
+        $src <: r"^\"@(?:app|pages|widgets|features)(?:/.*)?\"$"
+      },
+      {
+        $filename <: r".*/src/features/.*",
+        $src <: r"^\"@(?:app|pages|widgets)(?:/.*)?\"$"
+      },
+      {
+        $filename <: r".*/src/widgets/.*",
+        $src <: r"^\"@(?:app|pages)(?:/.*)?\"$"
+      },
+      { $filename <: r".*/src/pages/.*", $src <: r"^\"@app(?:/.*)?\"$" }
+    },
+    register_diagnostic(span=$src, message="FSD違反: typeof import() による上位レイヤーへの依存はできません。", severity="error")
+  },
+  // ============================================================
+  // TsImportType (typeof import()) のディープインポート検出
+  // ============================================================
+  TsImportType() as $stmt where {
+    $stmt <: contains `$src` where {
+      $src <: r"^\"@(?:pages|widgets|features|entities|shared)/[^/\"]+/.+\"$"
+    },
+    $filename <: r".*/src/.*",
+    register_diagnostic(span=$src, message="FSD違反: typeof import() 内でディープインポートはできません。公開API（バレルファイル）を使用してください。", severity="error")
+  },
+  // ============================================================
   // 相対パス — ../ でレイヤー/スライス/セグメント境界を越える
   // ============================================================
   or {
     JsImport() as $stmt,
     JsExportNamedFromClause() as $stmt,
     JsExportFromClause() as $stmt,
-    JsImportCallExpression() as $stmt
+    JsImportCallExpression() as $stmt,
+    TsImportType() as $stmt
   } where {
     $stmt <: contains `$src` where { $src <: r"^\"\.\.(?:/.*)?\"$" },
     or {

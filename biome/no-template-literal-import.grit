@@ -1,0 +1,9 @@
+language js
+
+// 動的 import() にテンプレートリテラルを使用した場合を検出。
+// 静的解析を回避してレイヤー制約をすり抜ける可能性があるため禁止。
+
+JsImportCallExpression() as $stmt where {
+  $stmt <: contains JsTemplateExpression(),
+  register_diagnostic(span=$stmt, message="FSD違反: 動的 import() にテンプレートリテラルを使用できません。静的な文字列パスを使用してください。", severity="error")
+}

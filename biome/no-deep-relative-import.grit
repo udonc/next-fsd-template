@@ -4,7 +4,8 @@ or {
   JsImport() as $stmt,
   JsExportNamedFromClause() as $stmt,
   JsExportFromClause() as $stmt,
-  JsImportCallExpression() as $stmt
+  JsImportCallExpression() as $stmt,
+  TsImportType() as $stmt
 } where {
   $stmt <: contains `$src` where { $src <: r"\"\.\./\.\..*" },
   register_diagnostic(span=$src, message="FSD違反: 2階層以上の相対パスでインポートできません。パスエイリアスを使用してください。", severity="error")

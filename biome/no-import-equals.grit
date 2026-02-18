@@ -1,0 +1,8 @@
+language js
+
+// TypeScript の import = require() 構文を禁止。
+// noCommonJs は require() をカバーするが import = require() はカバーしない。
+
+TsImportEqualsDeclaration() as $stmt where {
+  register_diagnostic(span=$stmt, message="CommonJS の import = require() 構文は使用できません。ESM の import を使用してください。", severity="error")
+}
