@@ -29,7 +29,7 @@ or {
       }
     },
     not { $target <: $current },
-    register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内のスライス間のクロスインポートは禁止されています。", severity="error")
+    register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内の別スライスからインポートできません。", severity="error")
   },
   // ============================================================
   // 相対パス — ../ でレイヤー/スライス/セグメント境界を越える
@@ -49,6 +49,6 @@ or {
       // src/app/ 直下: ../ でレイヤー外に脱出する
       { $filename <: r".*/src/app/[^/]+$" }
     },
-    register_diagnostic(span=$src, message="FSD違反: レイヤー/スライス/セグメント境界を越える相対パスインポートは禁止です。パスエイリアスを使用してください。", severity="error")
+    register_diagnostic(span=$src, message="FSD違反: レイヤー/スライス/セグメント境界を越える相対パスでインポートできません。パスエイリアスを使用してください。", severity="error")
   }
 }

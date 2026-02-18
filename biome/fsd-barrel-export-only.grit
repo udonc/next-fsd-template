@@ -15,5 +15,5 @@ or {
   TsEnumDeclaration() as $stmt
 } where {
   $filename <: r".*/src/(?:pages|widgets|features|entities)/[^/]+/index\.[^/]+$",
-  register_diagnostic(span=$stmt, message="FSD違反: バレルファイル (index.ts) は re-export のみ許可されています。", severity="error")
+  register_diagnostic(span=$stmt, message="FSD違反: バレルファイル (index.ts) では re-export 以外の記述はできません。", severity="error")
 }
