@@ -273,7 +273,7 @@
         }
       }
     },
-    // FSD app 層: 全レイヤ import 可だが deep import は禁止
+    // FSD app 層: 全レイヤー import 可だが deep import は禁止
     {
       "includes": ["src/app/**"],
       "linter": {

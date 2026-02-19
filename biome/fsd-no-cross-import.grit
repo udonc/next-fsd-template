@@ -1,10 +1,10 @@
 language js
 
+// 同一レイヤー内クロスインポート・相対パス境界越え・typeof import() のレイヤー制約を検出。
+// noRestrictedImports がカバーしない動的パターンを GritQL で補完する。
+
 or {
-  // ============================================================
-  // 絶対パス: @<layer>/<other_slice>
   // 同一レイヤー内の別スライスからのインポートを検出
-  // ============================================================
   or {
     JsImport() as $stmt,
     JsExportNamedFromClause() as $stmt,
@@ -39,10 +39,7 @@ or {
     },
     register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内の別スライスからインポートできません。@x/ クロスインポートAPIを使用してください。", severity="error")
   },
-  // ============================================================
   // 自スライスの @x/ アクセス（不要な間接参照）
-  // @entities/<self>/@x/<consumer> を自スライスからインポートするのは不要
-  // ============================================================
   or {
     JsImport() as $stmt,
     JsExportNamedFromClause() as $stmt,
@@ -57,10 +54,7 @@ or {
     $provider <: $current,
     register_diagnostic(span=$src, message="FSD違反: 自スライスの @x/ クロスインポートAPIにアクセスする必要はありません。ローカルセグメントから直接インポートしてください。", severity="error")
   },
-  // ============================================================
   // TsImportType (typeof import()) の上位レイヤー依存検出
-  // noRestrictedImports が typeof import() をカバーしないため GritQL で補完
-  // ============================================================
   TsImportType() as $stmt where {
     $stmt <: contains `$src` where { $src <: r"\"@.*" },
     or {
@@ -84,9 +78,7 @@ or {
     },
     register_diagnostic(span=$src, message="FSD違反: typeof import() による上位レイヤーへの依存はできません。", severity="error")
   },
-  // ============================================================
   // TsImportType (typeof import()) のディープインポート検出
-  // ============================================================
   TsImportType() as $stmt where {
     $stmt <: contains `$src` where {
       $src <: r"^\"@(?:pages|widgets|features|entities|shared)/[^/\"]+/.+\"$"
@@ -94,9 +86,7 @@ or {
     $filename <: r".*/src/.*",
     register_diagnostic(span=$src, message="FSD違反: typeof import() 内でディープインポートはできません。公開API（バレルファイル）を使用してください。", severity="error")
   },
-  // ============================================================
   // 相対パス — ../ でレイヤー/スライス/セグメント境界を越える
-  // ============================================================
   or {
     JsImport() as $stmt,
     JsExportNamedFromClause() as $stmt,

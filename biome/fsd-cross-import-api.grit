@@ -1,11 +1,10 @@
 language js
 
-// @x/ クロスインポートAPIファイルの制約:
-// 1. entities レイヤーの @x/ ファイルは re-export のみ許可
-// 2. entities 以外のレイヤーでは @x/ ディレクトリの使用自体を禁止
+// @x/ クロスインポートAPIファイルの制約を検出。
+// entities の @x/ は re-export のみ許可し、他レイヤーでの @x/ 使用を禁止する。
 
 or {
-  // --- entities の @x/ は re-export のみ ---
+  // entities の @x/ は re-export のみ
   or {
     JsDirective() as $stmt,
     JsImport() as $stmt,
@@ -23,7 +22,7 @@ or {
     $filename <: r".*/src/entities/[^/]+/@x/[^/]+\.[^/]+$",
     register_diagnostic(span=$stmt, message="FSD違反: @x/ クロスインポートAPIファイルでは re-export 以外の記述はできません。", severity="error")
   },
-  // --- entities 以外のレイヤーでは @x/ を使用禁止 ---
+  // entities 以外のレイヤーでは @x/ を使用禁止
   or {
     JsDirective() as $stmt,
     JsImport() as $stmt,

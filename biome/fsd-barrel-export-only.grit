@@ -1,7 +1,7 @@
 language js
 
-// バレルファイル (index.ts) は re-export のみ許可。
-// 対象: src/{pages,widgets,features,entities}/<slice>/index.*
+// バレルファイル (index.ts) で re-export 以外の記述を検出。
+// スライスの公開APIを明確にし、内部実装の漏洩を防ぐ。
 
 or {
   JsDirective() as $stmt,

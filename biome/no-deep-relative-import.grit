@@ -1,5 +1,8 @@
 language js
 
+// 2階層以上の相対パス (../../) によるインポートを検出。
+// FSD ではパスエイリアスを使うべきため、深い相対パスを禁止する。
+
 or {
   JsImport() as $stmt,
   JsExportNamedFromClause() as $stmt,
