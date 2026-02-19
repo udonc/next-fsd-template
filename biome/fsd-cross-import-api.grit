@@ -10,6 +10,7 @@ or {
     JsDirective() as $stmt,
     JsImport() as $stmt,
     JsVariableStatement() as $stmt,
+    JsVariableDeclarationClause() as $stmt,
     JsFunctionDeclaration() as $stmt,
     JsClassDeclaration() as $stmt,
     JsExpressionStatement() as $stmt,
