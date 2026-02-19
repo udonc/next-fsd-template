@@ -14,8 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Task Manager",
-  description: "FSD Task Manager",
+  title: "next-fsd-template",
+  description:
+    "A production-ready Next.js 16 template with Feature-Sliced Design architecture",
 };
 
 export default function RootLayout({
