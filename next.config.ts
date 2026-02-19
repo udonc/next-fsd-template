@@ -1,3 +1,4 @@
+import "./assert-pages-dir";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
