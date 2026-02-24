@@ -108,5 +108,7 @@ entities/
 19. **テンプレートリテラル `import()` 禁止** — `` import(`${var}`) `` のような動的パス構築は禁止。静的な文字列パスを使う
 20. **`@x/` は entities レイヤーのみ** — entities 以外のレイヤーで `@x/` ディレクトリを使用するとエラー
 21. **自スライスの `@x/` アクセス禁止** — 自スライスの `@x/` ファイルにアクセスするのは不要な間接参照。ローカルセグメントから直接インポートする
+22. **ファイル名 kebab-case 強制** — ファイル名は kebab-case のみ許可（camelCase, PascalCase, snake_case は不可）
+23. **default export 禁止** — `export default` は禁止。named export を使う。例外: App Router の特別ファイル (`page.tsx`, `layout.tsx` 等)、root 設定ファイル (`*.config.*`)、`proxy.ts`
 
 Lint ルールの実体は `biome.jsonc`（Biome 組み込みルール + overrides）と `biome/` ディレクトリ内の GritQL プラグイン（カスタムルール）。

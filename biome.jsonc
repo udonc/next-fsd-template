@@ -36,7 +36,14 @@
         "noPrivateImports": "error"
       },
       "style": {
-        "noCommonJs": "error"
+        "noCommonJs": "error",
+        "noDefaultExport": "error",
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "filenameCases": ["kebab-case"]
+          }
+        }
       },
       "performance": {
         "noReExportAll": "error"
@@ -98,11 +105,13 @@
       }
     },
     // Next.js App Router (app/): ルーティング専用、@app/@pages 以外の全インポートを禁止
+    // default export は Next.js App Router の規約 (page.tsx, layout.tsx 等) で必要なため許可
     {
       "includes": ["app/**"],
       "linter": {
         "rules": {
           "style": {
+            "noDefaultExport": "off",
             "noRestrictedImports": {
               "level": "error",
               "options": {
@@ -442,6 +451,17 @@
                 ]
               }
             }
+          }
+        }
+      }
+    },
+    // Root 設定ファイル + proxy: default export が必須のため許可
+    {
+      "includes": ["*.config.*", "proxy.*"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
           }
         }
       }
