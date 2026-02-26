@@ -172,6 +172,10 @@
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
+                    "group": ["@shared/*"],
+                    "message": "FSD違反: shared レイヤーはセグメント単位のインポートはできません。モジュール単位 (例: @shared/ui/badge) でインポートしてください。"
+                  },
+                  {
                     "group": [
                       "@shared/*/*/**",
                       "!@shared/*/*/index.server",
@@ -221,6 +225,10 @@
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
+                    "group": ["@shared/*"],
+                    "message": "FSD違反: shared レイヤーはセグメント単位のインポートはできません。モジュール単位 (例: @shared/ui/badge) でインポートしてください。"
+                  },
+                  {
                     "group": [
                       "@shared/*/*/**",
                       "!@shared/*/*/index.server",
@@ -266,6 +274,10 @@
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
+                    "group": ["@shared/*"],
+                    "message": "FSD違反: shared レイヤーはセグメント単位のインポートはできません。モジュール単位 (例: @shared/ui/badge) でインポートしてください。"
+                  },
+                  {
                     "group": [
                       "@shared/*/*/**",
                       "!@shared/*/*/index.server",
@@ -305,6 +317,10 @@
                   {
                     "group": ["@features", "@features/**"],
                     "message": "FSD違反: entities レイヤーから @features レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@shared/*"],
+                    "message": "FSD違反: shared レイヤーはセグメント単位のインポートはできません。モジュール単位 (例: @shared/ui/badge) でインポートしてください。"
                   },
                   {
                     "group": [
@@ -364,6 +380,10 @@
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
+                    "group": ["@shared/*"],
+                    "message": "FSD違反: shared レイヤーはセグメント単位のインポートはできません。モジュール単位 (例: @shared/ui/badge) でインポートしてください。"
+                  },
+                  {
                     "group": [
                       "@shared/*/*/**",
                       "!@shared/*/*/index.server",
@@ -407,6 +427,10 @@
                   {
                     "group": ["@entities", "@entities/**"],
                     "message": "FSD違反: shared レイヤーから @entities レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": ["@shared/*"],
+                    "message": "FSD違反: shared レイヤーはセグメント単位のインポートはできません。モジュール単位 (例: @shared/ui/badge) でインポートしてください。"
                   },
                   {
                     "group": [
