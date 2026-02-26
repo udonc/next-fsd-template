@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.15/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -24,14 +24,13 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noUnknownAtRules": "off"
-      },
-      "nursery": {
+        "noUnknownAtRules": "off",
         "noImportCycles": {
           "level": "error",
           "options": { "ignoreTypes": true }
         }
       },
+      "nursery": {},
       "correctness": {
         "noPrivateImports": "error"
       },
@@ -149,19 +148,35 @@
                     "message": "FSD違反: pages レイヤーから @app レイヤーをインポートできません。"
                   },
                   {
-                    "group": ["@widgets/*/**"],
+                    "group": [
+                      "@widgets/*/**",
+                      "!@widgets/*/index.server",
+                      "!@widgets/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
-                    "group": ["@features/*/**"],
+                    "group": [
+                      "@features/*/**",
+                      "!@features/*/index.server",
+                      "!@features/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
-                    "group": ["@entities/*/**"],
+                    "group": [
+                      "@entities/*/**",
+                      "!@entities/*/index.server",
+                      "!@entities/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
-                    "group": ["@shared/*/**"],
+                    "group": [
+                      "@shared/*/**",
+                      "!@shared/*/index.server",
+                      "!@shared/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   }
                 ]
@@ -190,15 +205,27 @@
                     "message": "FSD違反: widgets レイヤーから @pages レイヤーをインポートできません。"
                   },
                   {
-                    "group": ["@features/*/**"],
+                    "group": [
+                      "@features/*/**",
+                      "!@features/*/index.server",
+                      "!@features/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
-                    "group": ["@entities/*/**"],
+                    "group": [
+                      "@entities/*/**",
+                      "!@entities/*/index.server",
+                      "!@entities/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
-                    "group": ["@shared/*/**"],
+                    "group": [
+                      "@shared/*/**",
+                      "!@shared/*/index.server",
+                      "!@shared/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   }
                 ]
@@ -231,11 +258,19 @@
                     "message": "FSD違反: features レイヤーから @widgets レイヤーをインポートできません。"
                   },
                   {
-                    "group": ["@entities/*/**"],
+                    "group": [
+                      "@entities/*/**",
+                      "!@entities/*/index.server",
+                      "!@entities/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
-                    "group": ["@shared/*/**"],
+                    "group": [
+                      "@shared/*/**",
+                      "!@shared/*/index.server",
+                      "!@shared/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   }
                 ]
@@ -272,7 +307,11 @@
                     "message": "FSD違反: entities レイヤーから @features レイヤーをインポートできません。"
                   },
                   {
-                    "group": ["@shared/*/**"],
+                    "group": [
+                      "@shared/*/**",
+                      "!@shared/*/index.server",
+                      "!@shared/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   }
                 ]
@@ -293,23 +332,43 @@
               "options": {
                 "patterns": [
                   {
-                    "group": ["@pages/*/**"],
+                    "group": [
+                      "@pages/*/**",
+                      "!@pages/*/index.server",
+                      "!@pages/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
-                    "group": ["@widgets/*/**"],
+                    "group": [
+                      "@widgets/*/**",
+                      "!@widgets/*/index.server",
+                      "!@widgets/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
-                    "group": ["@features/*/**"],
+                    "group": [
+                      "@features/*/**",
+                      "!@features/*/index.server",
+                      "!@features/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
-                    "group": ["@entities/*/**"],
+                    "group": [
+                      "@entities/*/**",
+                      "!@entities/*/index.server",
+                      "!@entities/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
                   {
-                    "group": ["@shared/*/**"],
+                    "group": [
+                      "@shared/*/**",
+                      "!@shared/*/index.server",
+                      "!@shared/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   }
                 ]
@@ -350,7 +409,11 @@
                     "message": "FSD違反: shared レイヤーから @entities レイヤーをインポートできません。"
                   },
                   {
-                    "group": ["@shared/*/**"],
+                    "group": [
+                      "@shared/*/**",
+                      "!@shared/*/index.server",
+                      "!@shared/*/index.client"
+                    ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   }
                 ]
@@ -366,12 +429,28 @@
       "includes": [
         "src/pages/*/index.ts",
         "src/pages/*/index.tsx",
+        "src/pages/*/index.server.ts",
+        "src/pages/*/index.server.tsx",
+        "src/pages/*/index.client.ts",
+        "src/pages/*/index.client.tsx",
         "src/widgets/*/index.ts",
         "src/widgets/*/index.tsx",
+        "src/widgets/*/index.server.ts",
+        "src/widgets/*/index.server.tsx",
+        "src/widgets/*/index.client.ts",
+        "src/widgets/*/index.client.tsx",
         "src/features/*/index.ts",
         "src/features/*/index.tsx",
+        "src/features/*/index.server.ts",
+        "src/features/*/index.server.tsx",
+        "src/features/*/index.client.ts",
+        "src/features/*/index.client.tsx",
         "src/entities/*/index.ts",
-        "src/entities/*/index.tsx"
+        "src/entities/*/index.tsx",
+        "src/entities/*/index.server.ts",
+        "src/entities/*/index.server.tsx",
+        "src/entities/*/index.client.ts",
+        "src/entities/*/index.client.tsx"
       ],
       "linter": {
         "rules": {

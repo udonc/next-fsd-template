@@ -51,6 +51,8 @@ src/
 
 各スライスのルートに `index.ts` を配置し、公開APIとしてバレルエクスポートする。バレルファイルには re-export 文のみ記述可能（ロジックやインポートは禁止）。バレルファイル内ではパスエイリアス(`@xxx`)の使用も禁止 — ローカルセグメントからの相対インポートで re-export すること。
 
+**サーバー/クライアント専用バレルファイル**: `index.server.ts` / `index.client.ts` も使用可能。`import "server-only"` を含むコードを通常のバレルから分離し、Server/Client Component 間でのインポート問題を回避する。インポートは `@<layer>/<slice>/index.server` の形式。通常の `index.ts` と同じ制約（re-export のみ、パスエイリアス禁止）が適用される。`import "server-only"` や `import "client-only"` はバレルではなくセグメント内のファイルに記述する。
+
 **`shared` レイヤーは例外**: スライスを持たず、セグメント (`ui/`, `lib/`, `api/`, `config/`, `types/`) を直接配置する。`@shared/ui` のようにセグメント単位でインポートするが、`@shared/ui/Button` のようなディープインポートは不可。
 
 ### Cross-Import API (`@x/`)
@@ -89,14 +91,14 @@ entities/
 
 1. **上位レイヤーへの依存禁止** — 例: `@entities` から `@features` をインポート不可
 2. **同一レイヤー内のクロスインポート禁止** — 例: `@features/cart` から `@features/auth` をインポート不可（entities レイヤーは `@x/` クロスインポートAPIで例外あり）
-3. **ディープインポート禁止** — `@features/cart/lib/utils` ではなく `@features/cart` からインポート
+3. **ディープインポート禁止** — `@features/cart/lib/utils` ではなく `@features/cart` からインポート。例外: `@features/cart/index.server`, `@features/cart/index.client` のようなサーバー/クライアント専用バレルは許可
 4. **深い相対パス禁止** — `../../` 以上の相対パスは不可。パスエイリアスを使う
 5. **`export * from` 禁止** — 名前付きエクスポートを明示する
 6. **循環インポート禁止**
 7. **セグメント名制限** — `ui`, `model`, `api`, `lib`, `config` のみ許可
 8. **レイヤー名制限** — `src/` 直下は `app`, `pages`, `widgets`, `features`, `entities`, `shared` のみ
 9. **App Router (`app/`) からの直接依存制限** — `@widgets`, `@features`, `@entities` の直接インポート禁止。`@pages`/`@app` 経由で使う
-10. **バレルファイルは re-export のみ** — `index.ts` にロジックやインポート文を書くとエラー
+10. **バレルファイルは re-export のみ** — `index.ts` / `index.server.ts` / `index.client.ts` にロジックやインポート文を書くとエラー
 11. **FSD 境界越え相対パス禁止** — `src/` 配下でレイヤー/スライス/セグメント境界を越える `../` は禁止。パスエイリアスを使う
 12. **バレルファイル内パスエイリアス禁止** — `index.ts` 内では `@xxx` エイリアスを使用不可。ローカルセグメントからの相対パスで re-export する
 13. **`@x/` クロスインポートAPIのコンシューマー制限** — `@entities/<slice>/@x/<consumer>` は `<consumer>` スライスからのみインポート可能。それ以外のスライスからのインポートはエラー
