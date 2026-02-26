@@ -1,5 +1,5 @@
-import { TEMPLATE } from "@shared/config";
-import { ExternalLink } from "@shared/ui";
+import { TEMPLATE } from "@shared/config/template";
+import { ExternalLink } from "@shared/ui/external-link";
 
 export function Header() {
   return (

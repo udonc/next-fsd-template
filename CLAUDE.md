@@ -53,7 +53,7 @@ src/
 
 **サーバー/クライアント専用バレルファイル**: `index.server.ts` / `index.client.ts` も使用可能。`import "server-only"` を含むコードを通常のバレルから分離し、Server/Client Component 間でのインポート問題を回避する。インポートは `@<layer>/<slice>/index.server` の形式。通常の `index.ts` と同じ制約（re-export のみ、パスエイリアス禁止）が適用される。`import "server-only"` や `import "client-only"` はバレルではなくセグメント内のファイルに記述する。
 
-**`shared` レイヤーは例外**: スライスを持たず、セグメント (`ui/`, `lib/`, `api/`, `config/`, `types/`) を直接配置する。`@shared/ui` のようにセグメント単位でインポートするが、`@shared/ui/Button` のようなディープインポートは不可。
+**`shared` レイヤーは例外**: スライスを持たず、セグメント (`ui/`, `lib/`, `api/`, `config/`, `types/`) を直接配置する。各セグメント内にはモジュールディレクトリを作成し、`index.ts` バレルファイルで公開APIを提供する。インポートは `@shared/ui/badge` のようにモジュール単位で行う。セグメント単位のインポート (`@shared/ui`) やモジュール内へのディープインポート (`@shared/ui/badge/badge`) は不可。
 
 ### Cross-Import API (`@x/`)
 
@@ -91,7 +91,7 @@ entities/
 
 1. **上位レイヤーへの依存禁止** — 例: `@entities` から `@features` をインポート不可
 2. **同一レイヤー内のクロスインポート禁止** — 例: `@features/cart` から `@features/auth` をインポート不可（entities レイヤーは `@x/` クロスインポートAPIで例外あり）
-3. **ディープインポート禁止** — `@features/cart/lib/utils` ではなく `@features/cart` からインポート。例外: `@features/cart/index.server`, `@features/cart/index.client` のようなサーバー/クライアント専用バレルは許可
+3. **ディープインポート禁止** — `@features/cart/lib/utils` ではなく `@features/cart` からインポート。例外: `@features/cart/index.server`, `@features/cart/index.client` のようなサーバー/クライアント専用バレルは許可。`shared` レイヤーはモジュール単位 (`@shared/ui/badge`) がインポート単位となり、`@shared/ui/badge/badge` のようなモジュール内ディープインポートが禁止される
 4. **深い相対パス禁止** — `../../` 以上の相対パスは不可。パスエイリアスを使う
 5. **`export * from` 禁止** — 名前付きエクスポートを明示する
 6. **循環インポート禁止**

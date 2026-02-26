@@ -1,5 +1,5 @@
-import { TEMPLATE } from "@shared/config";
-import { Badge } from "@shared/ui";
+import { TEMPLATE } from "@shared/config/template";
+import { Badge } from "@shared/ui/badge";
 import { CopyCommandButton } from "./copy-command-button";
 
 export function HeroSection() {

@@ -1,4 +1,4 @@
-import { Badge } from "@shared/ui";
+import { Badge } from "@shared/ui/badge";
 import type { Layer } from "../model/layer";
 
 export function LayerCard({ layer }: { layer: Layer }) {

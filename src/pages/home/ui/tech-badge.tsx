@@ -1,4 +1,4 @@
-import { ExternalLink } from "@shared/ui";
+import { ExternalLink } from "@shared/ui/external-link";
 import type { TechItem } from "../model/tech-item";
 
 export function TechBadge({ item }: { item: TechItem }) {

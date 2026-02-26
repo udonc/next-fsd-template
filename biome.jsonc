@@ -173,9 +173,9 @@
                   },
                   {
                     "group": [
-                      "@shared/*/**",
-                      "!@shared/*/index.server",
-                      "!@shared/*/index.client"
+                      "@shared/*/*/**",
+                      "!@shared/*/*/index.server",
+                      "!@shared/*/*/index.client"
                     ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   }
@@ -222,9 +222,9 @@
                   },
                   {
                     "group": [
-                      "@shared/*/**",
-                      "!@shared/*/index.server",
-                      "!@shared/*/index.client"
+                      "@shared/*/*/**",
+                      "!@shared/*/*/index.server",
+                      "!@shared/*/*/index.client"
                     ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   }
@@ -267,9 +267,9 @@
                   },
                   {
                     "group": [
-                      "@shared/*/**",
-                      "!@shared/*/index.server",
-                      "!@shared/*/index.client"
+                      "@shared/*/*/**",
+                      "!@shared/*/*/index.server",
+                      "!@shared/*/*/index.client"
                     ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   }
@@ -308,9 +308,9 @@
                   },
                   {
                     "group": [
-                      "@shared/*/**",
-                      "!@shared/*/index.server",
-                      "!@shared/*/index.client"
+                      "@shared/*/*/**",
+                      "!@shared/*/*/index.server",
+                      "!@shared/*/*/index.client"
                     ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   }
@@ -365,9 +365,9 @@
                   },
                   {
                     "group": [
-                      "@shared/*/**",
-                      "!@shared/*/index.server",
-                      "!@shared/*/index.client"
+                      "@shared/*/*/**",
+                      "!@shared/*/*/index.server",
+                      "!@shared/*/*/index.client"
                     ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   }
@@ -410,9 +410,9 @@
                   },
                   {
                     "group": [
-                      "@shared/*/**",
-                      "!@shared/*/index.server",
-                      "!@shared/*/index.client"
+                      "@shared/*/*/**",
+                      "!@shared/*/*/index.server",
+                      "!@shared/*/*/index.client"
                     ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   }
@@ -492,6 +492,47 @@
                       "!./config/**"
                     ],
                     "message": "FSD違反: セグメント名は ui, model, api, lib, config のみ使用できます。"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    // FSD shared モジュールバレル: alias インポート禁止のみ（セグメント名制限なし）
+    {
+      "includes": [
+        "src/shared/*/*/index.ts",
+        "src/shared/*/*/index.tsx",
+        "src/shared/*/*/index.server.ts",
+        "src/shared/*/*/index.server.tsx",
+        "src/shared/*/*/index.client.ts",
+        "src/shared/*/*/index.client.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@app",
+                      "@app/**",
+                      "@pages",
+                      "@pages/**",
+                      "@widgets",
+                      "@widgets/**",
+                      "@features",
+                      "@features/**",
+                      "@entities",
+                      "@entities/**",
+                      "@shared",
+                      "@shared/**"
+                    ],
+                    "message": "FSD違反: バレルファイルではパスエイリアスを使用したインポートはできません。ローカルファイルから re-export してください。"
                   }
                 ]
               }

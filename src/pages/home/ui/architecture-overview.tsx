@@ -1,4 +1,4 @@
-import { SectionContainer } from "@shared/ui";
+import { SectionContainer } from "@shared/ui/section-container";
 import { LAYERS } from "../model/layer";
 import { LayerCard } from "./layer-card";
 

@@ -1,4 +1,4 @@
-import { SectionContainer } from "@shared/ui";
+import { SectionContainer } from "@shared/ui/section-container";
 import { TECH_STACK } from "../model/tech-item";
 import { TechBadge } from "./tech-badge";
 

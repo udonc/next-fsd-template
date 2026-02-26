@@ -81,7 +81,7 @@ or {
   // TsImportType (typeof import()) のディープインポート検出
   TsImportType() as $stmt where {
     $stmt <: contains `$src` where {
-      $src <: r"^\"@(?:pages|widgets|features|entities|shared)/[^/\"]+/.+\"$"
+      $src <: r"^\"@(?:(?:pages|widgets|features|entities)/[^/\"]+|shared/[^/\"]+/[^/\"]+)/.+\"$"
     },
     $filename <: r".*/src/.*",
     register_diagnostic(span=$src, message="FSD違反: typeof import() 内でディープインポートはできません。公開API（バレルファイル）を使用してください。", severity="error")
@@ -97,9 +97,9 @@ or {
     $stmt <: contains `$src` where { $src <: r"^\"\.\.(?:/.*)?\"$" },
     or {
       // src/<layer>/<unit>/ 直下: ../ でスライス/セグメント境界を越える
-      {
-        $filename <: r".*/(?:pages|widgets|features|entities|shared)/[^/]+/[^/]+$"
-      },
+      { $filename <: r".*/(?:pages|widgets|features|entities)/[^/]+/[^/]+$" },
+      // src/shared/<segment>/<module>/ 直下: ../ でモジュール境界を越える
+      { $filename <: r".*/shared/[^/]+/[^/]+/[^/]+$" },
       // src/app/ 直下: ../ でレイヤー外に脱出する
       { $filename <: r".*/src/app/[^/]+$" }
     },
