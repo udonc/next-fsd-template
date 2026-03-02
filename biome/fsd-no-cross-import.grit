@@ -2,9 +2,15 @@ language js
 
 // 同一レイヤー内クロスインポート・相対パス境界越え・typeof import() のレイヤー制約を検出。
 // noRestrictedImports がカバーしない動的パターンを GritQL で補完する。
+//
+// パフォーマンス最適化: 関連ブロックを統合して `contains` サブツリー走査を削減。
+// Before: 最大5回の contains → After: 最大2回
 
 or {
-  // 同一レイヤー内の別スライスからのインポートを検出
+  // ── 統合ブロック ABE: import/export 文 ──
+  // (A) 同一レイヤー内クロスインポート
+  // (B) 自スライス @x/ アクセス
+  // (E) 相対パス境界越え
   or {
     JsImport() as $stmt,
     JsExportNamedFromClause() as $stmt,
@@ -12,97 +18,82 @@ or {
     JsImportCallExpression() as $stmt,
     TsImportType() as $stmt
   } where {
-    $stmt <: contains `$src` where { $src <: r"\"@.*" },
-    $filename <: r".*/(pages|widgets|features|entities)/([^/]+)/.*"($layer, $current),
+    $stmt <: contains `$src` where { $src <: r"^\"(?:@|\.\.).*" },
     or {
-      { $layer <: "pages", $src <: r"^\"@pages/([^/\"]+)(?:/.*)?\"$"($target) },
+      // (A) 同一レイヤー内の別スライスからのインポートを検出
       {
-        $layer <: "widgets",
-        $src <: r"^\"@widgets/([^/\"]+)(?:/.*)?\"$"($target)
+        $src <: r"^\"@(pages|widgets|features|entities)/([^/\"]+)(?:/.*)?\"$"($src_layer, $target),
+        $filename <: r".*/(pages|widgets|features|entities)/([^/]+)/.*"($layer, $current),
+        $src_layer <: $layer,
+        not { $target <: $current },
+        // @x/ クロスインポートAPI例外: @entities/<provider>/@x/<consumer> は
+        // <consumer> が現在のスライスと一致する場合のみ許可
+        not {
+          $layer <: "entities",
+          $src <: r"^\"@entities/[^/]+/@x/([^/\"]+)\"$"($consumer),
+          $consumer <: $current
+        },
+        register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内の別スライスからインポートできません。@x/ クロスインポートAPIを使用してください。", severity="error")
       },
+      // (B) 自スライスの @x/ アクセス（不要な間接参照）
       {
-        $layer <: "features",
-        $src <: r"^\"@features/([^/\"]+)(?:/.*)?\"$"($target)
+        $src <: r"^\"@entities/([^/]+)/@x/.*\"$"($provider),
+        $filename <: r".*/entities/([^/]+)/.*"($current),
+        $provider <: $current,
+        register_diagnostic(span=$src, message="FSD違反: 自スライスの @x/ クロスインポートAPIにアクセスする必要はありません。ローカルセグメントから直接インポートしてください。", severity="error")
       },
+      // (E) 相対パス — ../ でレイヤー/スライス/セグメント境界を越える
       {
-        $layer <: "entities",
-        $src <: r"^\"@entities/([^/\"]+)(?:/.*)?\"$"($target)
+        $src <: r"^\"\.\.(?:/.*)?\"$",
+        or {
+          // src/<layer>/<unit>/ 直下: ../ でスライス/セグメント境界を越える
+          {
+            $filename <: r".*/(?:pages|widgets|features|entities)/[^/]+/[^/]+$"
+          },
+          // src/shared/<segment>/<module>/ 直下: ../ でモジュール境界を越える
+          { $filename <: r".*/shared/[^/]+/[^/]+/[^/]+$" },
+          // src/app/ 直下: ../ でレイヤー外に脱出する
+          { $filename <: r".*/src/app/[^/]+$" }
+        },
+        register_diagnostic(span=$src, message="FSD違反: レイヤー/スライス/セグメント境界を越える相対パスでインポートできません。パスエイリアスを使用してください。", severity="error")
       }
-    },
-    not { $target <: $current },
-    // @x/ クロスインポートAPI例外: @entities/<provider>/@x/<consumer> は
-    // <consumer> が現在のスライスと一致する場合のみ許可
-    not {
-      $layer <: "entities",
-      $src <: r"^\"@entities/[^/]+/@x/([^/\"]+)\"$"($consumer),
-      $consumer <: $current
-    },
-    register_diagnostic(span=$src, message="FSD違反: 同一レイヤー内の別スライスからインポートできません。@x/ クロスインポートAPIを使用してください。", severity="error")
+    }
   },
-  // 自スライスの @x/ アクセス（不要な間接参照）
-  or {
-    JsImport() as $stmt,
-    JsExportNamedFromClause() as $stmt,
-    JsExportFromClause() as $stmt,
-    JsImportCallExpression() as $stmt,
-    TsImportType() as $stmt
-  } where {
-    $stmt <: contains `$src` where {
-      $src <: r"^\"@entities/([^/]+)/@x/.*\"$"($provider)
-    },
-    $filename <: r".*/entities/([^/]+)/.*"($current),
-    $provider <: $current,
-    register_diagnostic(span=$src, message="FSD違反: 自スライスの @x/ クロスインポートAPIにアクセスする必要はありません。ローカルセグメントから直接インポートしてください。", severity="error")
-  },
-  // TsImportType (typeof import()) の上位レイヤー依存検出
+  // ── 統合ブロック CD: typeof import() ──
+  // (C) typeof import() 上位レイヤー依存
+  // (D) typeof import() ディープインポート
   TsImportType() as $stmt where {
-    $stmt <: contains `$src` where { $src <: r"\"@.*" },
-    or {
-      {
-        $filename <: r".*/src/shared/.*",
-        $src <: r"^\"@(?:app|pages|widgets|features|entities)(?:/.*)?\"$"
-      },
-      {
-        $filename <: r".*/src/entities/.*",
-        $src <: r"^\"@(?:app|pages|widgets|features)(?:/.*)?\"$"
-      },
-      {
-        $filename <: r".*/src/features/.*",
-        $src <: r"^\"@(?:app|pages|widgets)(?:/.*)?\"$"
-      },
-      {
-        $filename <: r".*/src/widgets/.*",
-        $src <: r"^\"@(?:app|pages)(?:/.*)?\"$"
-      },
-      { $filename <: r".*/src/pages/.*", $src <: r"^\"@app(?:/.*)?\"$" }
-    },
-    register_diagnostic(span=$src, message="FSD違反: typeof import() による上位レイヤーへの依存はできません。", severity="error")
-  },
-  // TsImportType (typeof import()) のディープインポート検出
-  TsImportType() as $stmt where {
-    $stmt <: contains `$src` where {
-      $src <: r"^\"@(?:(?:pages|widgets|features|entities)/[^/\"]+|shared/[^/\"]+/[^/\"]+)/.+\"$"
-    },
+    $stmt <: contains `$src` where { $src <: r"^\"@.*" },
     $filename <: r".*/src/.*",
-    register_diagnostic(span=$src, message="FSD違反: typeof import() 内でディープインポートはできません。公開API（バレルファイル）を使用してください。", severity="error")
-  },
-  // 相対パス — ../ でレイヤー/スライス/セグメント境界を越える
-  or {
-    JsImport() as $stmt,
-    JsExportNamedFromClause() as $stmt,
-    JsExportFromClause() as $stmt,
-    JsImportCallExpression() as $stmt,
-    TsImportType() as $stmt
-  } where {
-    $stmt <: contains `$src` where { $src <: r"^\"\.\.(?:/.*)?\"$" },
     or {
-      // src/<layer>/<unit>/ 直下: ../ でスライス/セグメント境界を越える
-      { $filename <: r".*/(?:pages|widgets|features|entities)/[^/]+/[^/]+$" },
-      // src/shared/<segment>/<module>/ 直下: ../ でモジュール境界を越える
-      { $filename <: r".*/shared/[^/]+/[^/]+/[^/]+$" },
-      // src/app/ 直下: ../ でレイヤー外に脱出する
-      { $filename <: r".*/src/app/[^/]+$" }
-    },
-    register_diagnostic(span=$src, message="FSD違反: レイヤー/スライス/セグメント境界を越える相対パスでインポートできません。パスエイリアスを使用してください。", severity="error")
+      // (C) 上位レイヤー依存
+      {
+        or {
+          {
+            $filename <: r".*/src/shared/.*",
+            $src <: r"^\"@(?:app|pages|widgets|features|entities)(?:/.*)?\"$"
+          },
+          {
+            $filename <: r".*/src/entities/.*",
+            $src <: r"^\"@(?:app|pages|widgets|features)(?:/.*)?\"$"
+          },
+          {
+            $filename <: r".*/src/features/.*",
+            $src <: r"^\"@(?:app|pages|widgets)(?:/.*)?\"$"
+          },
+          {
+            $filename <: r".*/src/widgets/.*",
+            $src <: r"^\"@(?:app|pages)(?:/.*)?\"$"
+          },
+          { $filename <: r".*/src/pages/.*", $src <: r"^\"@app(?:/.*)?\"$" }
+        },
+        register_diagnostic(span=$src, message="FSD違反: typeof import() による上位レイヤーへの依存はできません。", severity="error")
+      },
+      // (D) ディープインポート
+      {
+        $src <: r"^\"@(?:(?:pages|widgets|features|entities)/[^/\"]+|shared/[^/\"]+/[^/\"]+)/.+\"$",
+        register_diagnostic(span=$src, message="FSD違反: typeof import() 内でディープインポートはできません。公開API（バレルファイル）を使用してください。", severity="error")
+      }
+    }
   }
 }

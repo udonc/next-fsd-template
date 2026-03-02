@@ -3,20 +3,22 @@ language js
 // バレルファイル (index.ts) で re-export 以外の記述を検出。
 // スライスの公開APIを明確にし、内部実装の漏洩を防ぐ。
 
-or {
-  JsDirective() as $stmt,
-  JsImport() as $stmt,
-  JsVariableStatement() as $stmt,
-  JsVariableDeclarationClause() as $stmt,
-  JsFunctionDeclaration() as $stmt,
-  JsClassDeclaration() as $stmt,
-  JsExpressionStatement() as $stmt,
-  TsTypeAliasDeclaration() as $stmt,
-  TsInterfaceDeclaration() as $stmt,
-  TsEnumDeclaration() as $stmt,
-  JsExportDefaultExpressionClause() as $stmt,
-  JsExportDefaultDeclarationClause() as $stmt
-} where {
-  $filename <: r".*/src/(?:(?:pages|widgets|features|entities)/[^/]+|shared/[^/]+/[^/]+)/index\.[^/]+$",
-  register_diagnostic(span=$stmt, message="FSD違反: バレルファイル (index.ts) では re-export 以外の記述はできません。", severity="error")
+file($name, $body) where {
+  $name <: r".*/src/(?:(?:pages|widgets|features|entities)/[^/]+|shared/[^/]+/[^/]+)/index\.[^/]+$",
+  $body <: contains bubble or {
+    JsDirective() as $stmt,
+    JsImport() as $stmt,
+    JsVariableStatement() as $stmt,
+    JsVariableDeclarationClause() as $stmt,
+    JsFunctionDeclaration() as $stmt,
+    JsClassDeclaration() as $stmt,
+    JsExpressionStatement() as $stmt,
+    TsTypeAliasDeclaration() as $stmt,
+    TsInterfaceDeclaration() as $stmt,
+    TsEnumDeclaration() as $stmt,
+    JsExportDefaultExpressionClause() as $stmt,
+    JsExportDefaultDeclarationClause() as $stmt
+  } where {
+    register_diagnostic(span=$stmt, message="FSD違反: バレルファイル (index.ts) では re-export 以外の記述はできません。", severity="error")
+  }
 }
