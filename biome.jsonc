@@ -165,6 +165,14 @@
                   },
                   {
                     "group": [
+                      "@pages/*/**",
+                      "!@pages/*/index.server",
+                      "!@pages/*/index.client"
+                    ],
+                    "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": [
                       "@entities/*/**",
                       "!@entities/*/index.server",
                       "!@entities/*/index.client"
@@ -213,6 +221,14 @@
                       "@features/*/**",
                       "!@features/*/index.server",
                       "!@features/*/index.client"
+                    ],
+                    "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": [
+                      "@widgets/*/**",
+                      "!@widgets/*/index.server",
+                      "!@widgets/*/index.client"
                     ],
                     "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
                   },
@@ -267,6 +283,14 @@
                   },
                   {
                     "group": [
+                      "@features/*/**",
+                      "!@features/*/index.server",
+                      "!@features/*/index.client"
+                    ],
+                    "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）を使用してください。"
+                  },
+                  {
+                    "group": [
                       "@entities/*/**",
                       "!@entities/*/index.server",
                       "!@entities/*/index.client"
@@ -317,6 +341,15 @@
                   {
                     "group": ["@features", "@features/**"],
                     "message": "FSD違反: entities レイヤーから @features レイヤーをインポートできません。"
+                  },
+                  {
+                    "group": [
+                      "@entities/*/**",
+                      "!@entities/*/index.server",
+                      "!@entities/*/index.client",
+                      "!@entities/*/@x/*"
+                    ],
+                    "message": "FSD違反: ディープインポートはできません。公開API（バレルファイル）または @x/ クロスインポートAPIを使用してください。"
                   },
                   {
                     "group": ["@shared/*"],
