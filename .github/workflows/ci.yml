@@ -16,6 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+
+      - name: Lint
+        run: biome ci .
+
       - uses: pnpm/action-setup@v4
 
       - uses: actions/setup-node@v4
@@ -24,9 +30,6 @@ jobs:
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm lint
 
       - name: Type check
         run: pnpm typecheck
