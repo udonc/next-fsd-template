@@ -1,6 +1,6 @@
 # next-fsd-template
 
-Next.js 16 + [Feature-Sliced Design](https://feature-sliced.design) アーキテクチャのプロダクション向けテンプレート。
+Next.js 16 + [Feature-Sliced Design](https://feature-sliced.design) アーキテクチャのテンプレート。
 
 ## 技術スタック
 
